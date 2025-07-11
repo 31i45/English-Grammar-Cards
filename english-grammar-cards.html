@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grammar Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card-flip {
+                transform-style: preserve-3d;
+                transition: transform 0.6s;
+            }
+            .card-flip.flipped {
+                transform: rotateY(180deg);
+            }
+            .card-front,
+            .card-back {
+                backface-visibility: hidden;
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <div class="card-container relative h-[550px] perspective-1000">
+            <div class="card-flip absolute w-full h-full bg-white rounded-xl shadow-lg" id="card">
+                <!-- Favorite Button - Front -->
+                <div class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 flex items-center justify-center cursor-pointer z-10" id="favoriteBtnFront">
+                    <i class="fa fa-heart-o text-gray-400"></i>
+                </div>
+
+                <!-- Card Front -->
+                <div class="card-front absolute inset-0 p-6 flex flex-col">
+                    <div class="text-sm text-gray-500 mb-2" id="grammarCategory">基础语法</div>
+                    <h2 class="text-2xl font-bold mb-6" id="grammarTitle">一般现在时</h2>
+                    
+                    <div class="flex-grow flex flex-col items-center justify-center">
+                        <div class="text-center mb-6 p-4 bg-gray-50 rounded-lg w-full" id="grammarStructure">
+                            <span class="text-lg">主语 + 动词(s/es) + 宾语</span>
+                        </div>
+                        <div class="text-center text-gray-600" id="chineseExplanation">
+                            表示经常性、习惯性的动作或状态
+                        </div>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <div class="flex justify-between mb-4">
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="prev">
+                                <i class="fa fa-arrow-left mr-1"></i> 上一张
+                            </button>
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="flip">
+                                查看详情 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="next">
+                                下一张 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="text-center text-sm text-gray-500" id="cardIndex">卡片 1/60</div>
+                    </div>
+                </div>
+
+                <!-- Card Back -->
+                <div class="card-back absolute inset-0 p-6 flex flex-col">
+                    <h3 class="text-xl font-bold mb-4 text-center" id="detailTitle">一般现在时详解</h3>
+                    
+                    <div class="flex-grow overflow-y-auto text-gray-700 space-y-4 text-sm" id="detailContent">
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1">构成形式</h4>
+                            <ul class="list-disc list-inside space-y-1 pl-2 text-sm">
+                                <li>肯定句: I <span class="font-bold">work</span> in an office</li>
+                                <li>否定句: She <span class="font-bold">does not work</span> here</li>
+                                <li>疑问句: <span class="font-bold">Do</span> you <span class="font-bold">speak</span> English?</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1">用法说明</h4>
+                            <p>表示经常性、习惯性的动作或状态；客观真理和科学事实；按计划或时刻表发生的动作。</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1">例句</h4>
+                            <ul class="list-disc list-inside space-y-1 pl-2 text-sm">
+                                <li>He <span class="italic">gets up</span> at 7 every morning</li>
+                                <li>The sun <span class="italic">rises</span> in the east</li>
+                                <li>The train <span class="italic">leaves</span> at 8 PM</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="flex justify-between mb-4">
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="prev">
+                                <i class="fa fa-arrow-left mr-1"></i> 上一张
+                            </button>
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="flip">
+                                返回 <i class="fa fa-arrow-left ml-1"></i>
+                            </button>
+                            <button class="px-6 py-3 bg-gray-800 text-white rounded-full text-sm" data-action="next">
+                                下一张 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="text-center text-sm text-gray-500" id="cardIndexBack">卡片 1/60</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 精简版语法数据集（按难度递增排列）
+        const grammarData = [
+            // 一、基础时态 (A1-A2, 8张)
+            { id: 1, category: "基础时态", title: "一般现在时", difficulty: "A1", structure: "主语 + 动词(s/es) + 宾语", chineseExplanation: "表示经常性、习惯性的动作或状态", details: { form: ['肯定句: I <span class="font-bold">work</span> in an office', '否定句: She <span class="font-bold">does not work</span> here', '疑问句: <span class="font-bold">Do</span> you <span class="font-bold">speak</span> English?'], usage: '表示经常性、习惯性的动作或状态；客观真理和科学事实；按计划或时刻表发生的动作。', examples: ['He <span class="italic">gets up</span> at 7 every morning', 'The sun <span class="italic">rises</span> in the east', 'The train <span class="italic">leaves</span> at 8 PM'] } },
+            { id: 2, category: "基础时态", title: "现在进行时", difficulty: "A1", structure: "主语 + am/is/are + 动词-ing + 宾语", chineseExplanation: "表示现在正在进行的动作", details: { form: ['肯定句: I <span class="font-bold">am working</span>', '否定句: She <span class="font-bold">is not working</span>', '疑问句: <span class="font-bold">Are</span> you <span class="font-bold">working</span>?'], usage: '表示说话时正在进行的动作；表示现阶段正在进行但说话时不一定正在进行的动作；表示按计划或安排近期要进行的动作。', examples: ['I <span class="italic">am reading</span> a book now', 'He <span class="italic">is learning</span> English', 'I <span class="italic">am leaving</span> tomorrow'] } },
+            { id: 3, category: "基础时态", title: "一般过去时", difficulty: "A1", structure: "主语 + 动词过去式 + 宾语", chineseExplanation: "表示过去某个时间发生的动作或存在的状态", details: { form: ['肯定句: I <span class="font-bold">worked</span> yesterday', '否定句: She <span class="font-bold">did not work</span> here', '疑问句: <span class="font-bold">Did</span> you <span class="font-bold">go</span> there?'], usage: '表示过去某个特定时间发生且已完成的动作；表示过去习惯性的动作；在条件句中表示与现在或将来事实不符的假设。', examples: ['I <span class="italic">saw</span> him yesterday', 'She <span class="italic">lived</span> here for three years', 'If I <span class="italic">were</span> you, I would go'] } },
+            { id: 4, category: "基础时态", title: "一般将来时", difficulty: "A1", structure: "主语 + will/shall + 动词原形 + 宾语", chineseExplanation: "表示将要发生的动作或存在的状态", details: { form: ['肯定句: I <span class="font-bold">will work</span> tomorrow', '否定句: She <span class="font-bold">will not work</span> here', '疑问句: <span class="font-bold">Will</span> you <span class="font-bold">come</span> tomorrow?'], usage: '表示将要发生的动作或情况；表示将来的意愿或决心；表示对未来的预测。', examples: ['I <span class="italic">will go</span> to Beijing tomorrow', 'He <span class="italic">will help</span> you', 'It <span class="italic">will rain</span> tomorrow'] } },
+            { id: 5, category: "基础时态", title: "过去进行时", difficulty: "A2", structure: "主语 + was/were + 动词-ing + 宾语", chineseExplanation: "表示过去某一时刻正在进行的动作", details: { form: ['肯定句: I <span class="font-bold">was working</span>', '否定句: She <span class="font-bold">was not working</span>', '疑问句: <span class="font-bold">Were</span> you <span class="font-bold">working</span>?'], usage: '表示过去某一时刻或某一段时间正在进行的动作；描述一个背景动作，被另一个短动作打断。', examples: ['I <span class="italic">was reading</span> at 8 last night', 'She <span class="italic">was cooking</span> when I arrived', 'They <span class="italic">were playing</span> football all afternoon'] } },
+            { id: 6, category: "基础时态", title: "现在完成时", difficulty: "A2", structure: "主语 + have/has + 过去分词 + 宾语", chineseExplanation: "表示过去发生并持续到现在的动作或状态", details: { form: ['肯定句: I <span class="font-bold">have worked</span> here', '否定句: She <span class="font-bold">has not worked</span> here', '疑问句: <span class="font-bold">Have</span> you <span class="font-bold">finished</span>?'], usage: '表示过去发生并持续到现在的动作；表示过去发生但对现在有影响的动作；表示从过去到现在反复发生的动作。', examples: ['I <span class="italic">have lived</span> here for 10 years', 'She <span class="italic">has finished</span> her homework', 'He <span class="italic">has visited</span> Paris three times'] } },
+            { id: 7, category: "基础时态", title: "过去完成时", difficulty: "B1", structure: "主语 + had + 过去分词 + 宾语", chineseExplanation: "表示过去某一时间前已经完成的动作", details: { form: ['肯定句: I <span class="font-bold">had worked</span> here', '否定句: She <span class="font-bold">had not worked</span> here', '疑问句: <span class="font-bold">Had</span> you <span class="font-bold">finished</span>?'], usage: '表示在过去某个时间或动作之前已经完成的动作；表示从过去某一时间开始持续到过去另一时间的动作。', examples: ['I <span class="italic">had finished</span> before he came', 'She <span class="italic">had lived</span> here for 5 years when I met her', 'They <span class="italic">had already left</span> when we arrived'] } },
+            { id: 8, category: "基础时态", title: "将来完成时", difficulty: "B2", structure: "主语 + will have + 过去分词 + 宾语", chineseExplanation: "表示将来某一时间前将完成的动作", details: { form: ['肯定句: I <span class="font-bold">will have worked</span> here', '否定句: She <span class="font-bold">will not have worked</span> here', '疑问句: <span class="font-bold">Will</span> you <span class="font-bold">have finished</span>?'], usage: '表示在将来某一时间之前完成的动作；表示持续到将来某一时间的动作或状态。', examples: ['I <span class="italic">will have finished</span> by tomorrow', 'She <span class="italic">will have lived</span> here for 10 years next month', 'They <span class="italic">will have left</span> before we arrive'] } },
+
+            // 二、名词代词 (A1-B1, 9张)
+            { id: 9, category: "名词代词", title: "可数名词与不可数名词", difficulty: "A1", structure: "可数名词有单复数形式，不可数名词没有", chineseExplanation: "表示人、事物、地点等的名称", details: { form: ['单数: a book, an apple', '复数: books, apples', '不可数: water, information'], usage: '可数名词可以被数词直接修饰，有单复数变化；不可数名词不能被数词直接修饰，没有复数形式。', examples: ['I have two <span class="italic">books</span>', 'She drinks a glass of <span class="italic">water</span>', 'We need some <span class="italic">information</span>'] } },
+            { id: 10, category: "名词代词", title: "人称代词", difficulty: "A1", structure: "主格: I/you/he/she/it/we/they", chineseExplanation: "代替人或事物的代词", details: { form: ['主格: I, you, he, she, it, we, they', '宾格: me, you, him, her, it, us, them'], usage: '主格作句子的主语；宾格作动词或介词的宾语。', examples: ['<span class="italic">He</span> is a student', 'She helped <span class="italic">me</span>', 'They are talking to <span class="italic">us</span>'] } },
+            { id: 11, category: "名词代词", title: "物主代词", difficulty: "A1", structure: "形容词性: my/your/his/her/its/our/their", chineseExplanation: "表示所有关系的代词", details: { form: ['形容词性: my, your, his, her, its, our, their', '名词性: mine, yours, his, hers, its, ours, theirs'], usage: '形容词性物主代词后接名词；名词性物主代词可独立使用，相当于形容词性物主代词+名词。', examples: ['This is <span class="italic">my</span> book', 'The book is <span class="italic">mine</span>', 'Her pen is red, <span class="italic">yours</span> is blue'] } },
+            { id: 12, category: "名词代词", title: "反身代词", difficulty: "A2", structure: "myself/yourself/himself/herself/itself/ourselves/themselves", chineseExplanation: "表示动作返回到主语本身的代词", details: { form: ['单数: myself, yourself, himself, herself, itself', '复数: ourselves, yourselves, themselves'], usage: '作宾语，表示动作的承受者是主语本身；作同位语，加强语气；用于某些固定搭配。', examples: ['I <span class="italic">taught myself</span> English', 'She <span class="italic">herself</span> did it', 'He <span class="italic">hurt himself</span>'] } },
+            { id: 13, category: "名词代词", title: "指示代词", difficulty: "A2", structure: "this/that/these/those", chineseExplanation: "表示指示概念的代词", details: { form: ['单数: this(近), that(远)', '复数: these(近), those(远)'], usage: 'this/these指近处的人或物；that/those指远处的人或物；that/those可代替前面提到的名词以避免重复。', examples: ['<span class="italic">This</span> is a book', '<span class="italic">Those</span> are apples', 'The weather here is better than <span class="italic">that</span> in Beijing'] } },
+            { id: 14, category: "名词代词", title: "不定代词", difficulty: "B1", structure: "some/any/no/many/much/few/little", chineseExplanation: "不指明代替任何特定名词的代词", details: { form: ['some/any: 一些', 'many/much: 许多', 'few/little: 很少', 'no/none: 没有'], usage: 'some用于肯定句，any用于否定句和疑问句；many修饰可数名词，much修饰不可数名词；few/little表示否定意义，a few/a little表示肯定意义。', examples: ['I have <span class="italic">some</span> books', 'There isn\'t <span class="italic">any</span> water', 'He has <span class="italic">many</span> friends'] } },
+            { id: 15, category: "名词代词", title: "疑问代词", difficulty: "A2", structure: "who/whom/whose/what/which", chineseExplanation: "用于构成疑问句的代词", details: { form: ['who(主格), whom(宾格), whose(所有格)', 'what(什么), which(哪一个)'], usage: 'who/whom指人，whose指所有关系，what指事物，which指在一定范围内选择。', examples: ['<span class="italic">Who</span> is he?', '<span class="italic">Whom</span> are you talking to?', '<span class="italic">What</span> is this?'] } },
+            { id: 16, category: "名词代词", title: "关系代词", difficulty: "B1", structure: "who/whom/whose/which/that", chineseExplanation: "引导定语从句的代词", details: { form: ['who/whom指人，which指物', 'that可指人或物，whose指所有关系'], usage: '引导定语从句，代替先行词，并在从句中充当主语、宾语或定语。', examples: ['The man <span class="italic">who</span> is standing there is my teacher', 'This is the book <span class="italic">which</span> I bought yesterday', 'He is the student <span class="italic">whose</span> father is a doctor'] } },
+            { id: 17, category: "名词代词", title: "相互代词", difficulty: "B1", structure: "each other/one another", chineseExplanation: "表示相互关系的代词", details: { form: ['each other(两者之间)', 'one another(三者或三者以上)'], usage: '表示两者或多者之间的相互关系，通常作宾语。', examples: ['They help <span class="italic">each other</span>', 'We should learn from <span class="italic">one another</span>', 'They love <span class="italic">each other</span>'] } },
+
+            // 三、动词相关 (A1-B2, 14张)
+            { id: 18, category: "动词相关", title: "及物动词与不及物动词", difficulty: "A1", structure: "及物动词 + 宾语；不及物动词(+状语)", chineseExplanation: "根据是否需要宾语分类的动词", details: { form: ['及物动词: vt. + 宾语', '不及物动词: vi. (+ 状语)'], usage: '及物动词必须带宾语；不及物动词不能直接带宾语，若需要跟宾语，须加介词；有些动词既可作及物动词也可作不及物动词。', examples: ['He <span class="italic">likes</span> English (vt.)', 'The sun <span class="italic">rises</span> in the east (vi.)', 'She <span class="italic">sings</span> well (vi.) / She <span class="italic">sings</span> a song (vt.)'] } },
+            { id: 19, category: "动词相关", title: "系动词", difficulty: "A1", structure: "主语 + 系动词 + 表语", chineseExplanation: "连接主语和表语的动词", details: { form: ['be动词: am, is, are, was, were', '感官动词: look, sound, smell, taste, feel', '变化动词: become, get, turn, grow'], usage: '系动词后接表语，说明主语的状态、性质、特征或身份；不能单独作谓语，必须和表语一起构成谓语。', examples: ['He <span class="italic">is</span> a student', 'The flower <span class="italic">looks</span> beautiful', 'She <span class="italic">became</span> a doctor'] } },
+            { id: 20, category: "动词相关", title: "情态动词", difficulty: "A2", structure: "情态动词 + 动词原形", chineseExplanation: "表示能力、许可、义务、推测等的动词", details: { form: ['can/could: 能力、许可', 'may/might: 许可、可能性', 'must/have to: 必须', 'should/ought to: 应该'], usage: '情态动词没有人称和数的变化；后接动词原形；否定式直接加not；疑问式将情态动词提前。', examples: ['I <span class="italic">can</span> swim', 'You <span class="italic">may</span> go now', 'He <span class="italic">must</span> study hard'] } },
+            { id: 21, category: "动词相关", title: "动词不定式", difficulty: "A2", structure: "to + 动词原形", chineseExplanation: "动词的一种非谓语形式", details: { form: ['基本形式: to + 动词原形', '否定式: not to + 动词原形', '被动式: to be + 过去分词'], usage: '作主语、宾语、表语、定语、状语或宾语补足语；表示具体的动作、将来的动作或一次性的动作。', examples: ['<span class="italic">To learn</span> English is important', 'I want <span class="italic">to go</span> there', 'He came <span class="italic">to see</span> me'] } },
+            { id: 22, category: "动词相关", title: "动名词", difficulty: "B1", structure: "动词-ing形式", chineseExplanation: "动词的一种非谓语形式，具有名词性质", details: { form: ['基本形式: 动词-ing', '否定式: not + 动词-ing', '被动式: being + 过去分词'], usage: '作主语、宾语、表语或定语；表示抽象的动作、习惯性的动作或已完成的动作。', examples: ['<span class="italic">Swimming</span> is good for health', 'I like <span class="italic">reading</span>', 'His <span class="italic">job</span> is teaching'] } },
+            { id: 23, category: "动词相关", title: "分词", difficulty: "B1", structure: "现在分词: 动词-ing；过去分词: 动词-ed", chineseExplanation: "动词的非谓语形式，具有形容词和副词性质", details: { form: ['现在分词: 动词-ing', '过去分词: 动词-ed/-en等', '否定式: not + 分词'], usage: '现在分词表示主动或进行；过去分词表示被动或完成；可作定语、状语、表语或宾语补足语。', examples: ['The <span class="italic">running</span> water is clean', 'The <span class="italic">broken</span> window needs repairing', 'He sat there <span class="italic">reading</span> a book'] } },
+            { id: 24, category: "动词相关", title: "短语动词", difficulty: "B1", structure: "动词 + 介词/副词", chineseExplanation: "由动词和介词或副词构成的固定搭配", details: { form: ['动词 + 介词: look for, listen to', '动词 + 副词: put on, take off', '动词 + 副词 + 介词: get along with'], usage: '短语动词的意义往往不是其组成部分的简单相加，而是具有新的意义；有些短语动词可分开使用，有些则不可。', examples: ['I <span class="italic">look for</span> my book', 'She <span class="italic">put on</span> her coat', 'We <span class="italic">get along with</span> each other'] } },
+            { id: 25, category: "动词相关", title: "时态一致", difficulty: "B1", structure: "主句与从句时态呼应", chineseExplanation: "复合句中主句和从句时态的协调关系", details: { form: ['主句现在时，从句可根据需要用任何时态', '主句过去时，从句通常用过去的某种时态', '客观真理不受主句时态影响'], usage: '在复合句中，主句和从句的时态通常要保持一致；当从句表示客观真理或习惯性动作时，不受主句时态影响。', examples: ['I know that he <span class="italic">is</span> a student', 'I knew that he <span class="italic">was</span> a student', 'The teacher said that the earth <span class="italic">goes</span> around the sun'] } },
+            { id: 26, category: "动词相关", title: "被动语态", difficulty: "B1", structure: "be + 过去分词", chineseExplanation: "表示主语是动作承受者的语态", details: { form: ['一般现在时: am/is/are + done', '一般过去时: was/were + done', '一般将来时: will be + done', '现在完成时: have/has been + done'], usage: '强调动作的承受者；不知道或不必说出动作的执行者；动作的执行者由by引出。', examples: ['The book <span class="italic">is written</span> by him', 'The house <span class="italic">was built</span> in 2000', 'The work <span class="italic">will be finished</span> tomorrow'] } },
+            { id: 27, category: "动词相关", title: "虚拟语气", difficulty: "B2", structure: "与事实相反的假设表达", chineseExplanation: "表示说话人所说的话不是事实，而是一种假设、愿望、怀疑或推测", details: { form: ['与现在事实相反: if + 过去式, would + 动词原形', '与过去事实相反: if + had done, would have done', '与将来事实相反: if + should do/were to do, would do'], usage: '表示与事实相反的假设；表示愿望、建议、命令、要求等；用于某些固定句型中。', examples: ['If I <span class="italic">were</span> you, I would go', 'If I <span class="italic">had known</span>, I would have come', 'I wish I <span class="italic">could fly</span>'] } },
+            { id: 28, category: "动词相关", title: "非谓语动词用法区别", difficulty: "B2", structure: "不定式/动名词/分词的用法差异", chineseExplanation: "三种非谓语动词的主要用法区别", details: { form: ['不定式: to + 动词原形，表具体/将来动作', '动名词: 动词-ing，表抽象/习惯动作', '分词: 现在分词表主动/进行，过去分词表被动/完成'], usage: '不定式作状语多表目的、结果或原因；动名词作主语/宾语多表抽象概念；分词作定语/状语多表主动/被动或时间/原因/条件等。', examples: ['I like <span class="italic">to swim</span> (具体动作)', '<span class="italic">Swimming</span> is good (抽象概念)', 'The <span class="italic">broken</span> cup (被动完成)'] } },
+            { id: 29, category: "动词相关", title: "情态动词表推测", difficulty: "B2", structure: "情态动词 + 动词原形/完成式", chineseExplanation: "使用情态动词表示对现在或过去情况的推测", details: { form: ['对现在推测: must/may/might + 动词原形', '对过去推测: must/may/might + have done', '否定推测: can\'t/couldn\'t + 动词原形/have done'], usage: 'must表示肯定推测(一定)，may/might表示可能推测(可能)，can\'t表示否定推测(不可能)；对过去情况的推测用完成式。', examples: ['He <span class="italic">must be</span> at home', 'She <span class="italic">may have gone</span> to school', 'They <span class="italic">can\'t have finished</span>'] } },
+            { id: 30, category: "动词相关", title: "使役动词", difficulty: "B1", structure: "make/let/have + 宾语 + 动词原形", chineseExplanation: "表示使、让、叫等意义的动词", details: { form: ['make sb. do sth.: 使某人做某事', 'let sb. do sth.: 让某人做某事', 'have sb. do sth.: 叫某人做某事'], usage: '使役动词后接不带to的不定式作宾语补足语；变为被动语态时，不定式要加to。', examples: ['He <span class="italic">made</span> me laugh', 'My mother <span class="italic">let</span> me go', 'I <span class="italic">had</span> him repair my bike'] } },
+            { id: 31, category: "动词相关", title: "感官动词", difficulty: "B1", structure: "see/hear/feel + 宾语 + 动词原形/现在分词", chineseExplanation: "表示感觉的动词", details: { form: ['感官动词 + 宾语 + 动词原形: 强调动作的全过程', '感官动词 + 宾语 + 现在分词: 强调动作正在进行'], usage: '感官动词后可接不带to的不定式或现在分词作宾语补足语；变为被动语态时，不定式要加to。', examples: ['I <span class="italic">saw</span> him go out', 'I <span class="italic">heard</span> her singing', 'He was <span class="italic">seen to</span> enter the room'] } },
+
+            // 四、句子结构 (A1-B2, 16张)
+            { id: 32, category: "句子结构", title: "基本句型", difficulty: "A1", structure: "主谓/主谓宾/主系表/主谓双宾/主谓宾补", chineseExplanation: "英语中五种基本句子结构", details: { form: ['主谓: S + V', '主谓宾: S + V + O', '主系表: S + LinkV + P', '主谓双宾: S + V + IO + DO', '主谓宾补: S + V + O + C'], usage: '所有英语句子都基于这五种基本句型；复杂句是基本句型的扩展和组合。', examples: ['He <span class="italic">runs</span> (主谓)', 'I <span class="italic">like</span> apples (主谓宾)', 'She <span class="italic">is</span> happy (主系表)'] } },
+            { id: 33, category: "句子结构", title: "陈述句", difficulty: "A1", structure: "主语 + 谓语 + 其他成分", chineseExplanation: "陈述一个事实或表达一个看法的句子", details: { form: ['肯定句: S + V + ...', '否定句: S + don\'t/doesn\'t/didn\'t + V + ...', '否定句: S + be not/have not + ...'], usage: '陈述句用于陈述事实或表达看法；句末用句号；否定句通常在动词前加not。', examples: ['I <span class="italic">am</span> a student', 'She <span class="italic">doesn\'t like</span> coffee', 'They <span class="italic">have finished</span> their work'] } },
+            { id: 34, category: "句子结构", title: "疑问句", difficulty: "A1", structure: "疑问词/助动词 + 主语 + 谓语 + 其他成分", chineseExplanation: "提出问题的句子", details: { form: ['一般疑问句: Be/助动词 + S + V + ...?', '特殊疑问句: 疑问词 + Be/助动词 + S + V + ...?', '选择疑问句: 一般疑问句 + or + 选择部分?'], usage: '一般疑问句用yes/no回答；特殊疑问句用完整句子回答；选择疑问句选择其中一部分回答。', examples: ['<span class="italic">Are</span> you a student?', '<span class="italic">What</span> do you like?', '<span class="italic">Do</span> you like tea or coffee?'] } },
+            { id: 35, category: "句子结构", title: "祈使句", difficulty: "A1", structure: "动词原形/Don't + 动词原形 + 其他成分", chineseExplanation: "表示命令、请求、劝告、警告等的句子", details: { form: ['肯定式: 动词原形 + ...', '否定式: Don\'t + 动词原形 + ...', '强调式: Do + 动词原形 + ...'], usage: '祈使句通常省略主语you；句末用感叹号或句号；表示请求时可加上please。', examples: ['<span class="italic">Open</span> the door', '<span class="italic">Don\'t</span> smoke', '<span class="italic">Please</span> sit down'] } },
+            { id: 36, category: "句子结构", title: "感叹句", difficulty: "A2", structure: "What + (a/an) + 形容词 + 名词 + (主语 + 谓语)!", chineseExplanation: "表示强烈感情的句子", details: { form: ['What + (a/an) + adj. + n. + (S + V)!', 'How + adj./adv. + (S + V)!', 'How + 句子!'], usage: 'what修饰名词，how修饰形容词、副词或整个句子；句末用感叹号。', examples: ['<span class="italic">What</span> a beautiful day!', '<span class="italic">How</span> fast he runs!', '<span class="italic">How</span> I love you!'] } },
+            { id: 37, category: "句子结构", title: "简单句", difficulty: "A2", structure: "一个主语 + 一个谓语", chineseExplanation: "只包含一个主谓结构的句子", details: { form: ['主谓', '主谓宾', '主系表', '主谓双宾', '主谓宾补'], usage: '简单句是最基本的句子类型；可以包含并列主语或并列谓语，但仍只有一个主谓结构。', examples: ['I <span class="italic">study</span> English', 'He <span class="italic">and I</span> <span class="italic">go</span> to school', 'She <span class="italic">sings</span> and <span class="italic">dances</span>'] } },
+            { id: 38, category: "句子结构", title: "并列句", difficulty: "B1", structure: "简单句 + 并列连词 + 简单句", chineseExplanation: "由并列连词连接两个或多个简单句构成的句子", details: { form: ['S1 + V1 + ... + and/or/but/so/for + S2 + V2 + ...', 'S1 + V1 + ...; S2 + V2 + ... (分号连接)'], usage: '并列句中的各个分句地位平等；常用的并列连词有and, or, but, so, for等；也可用分号连接分句。', examples: ['I like tea <span class="italic">and</span> she likes coffee', 'He is tired <span class="italic">but</span> he keeps working', 'I didn\'t go out <span class="italic">for</span> it rained'] } },
+            { id: 39, category: "句子结构", title: "复合句", difficulty: "B1", structure: "主句 + 从句", chineseExplanation: "由一个主句和一个或多个从句构成的句子", details: { form: ['主句 + 名词性从句', '主句 + 定语从句', '主句 + 状语从句'], usage: '主句是句子的主体，能独立存在；从句不能独立存在，必须依附主句；从句由引导词引导。', examples: ['I know <span class="italic">that he is a student</span> (宾语从句)', 'The man <span class="italic">who is standing there</span> is my teacher (定语从句)', '<span class="italic">When I arrived</span>, he was reading (状语从句)'] } },
+            { id: 40, category: "句子结构", title: "主语从句", difficulty: "B2", structure: "连接词 + 句子 + 谓语 + 其他成分", chineseExplanation: "在复合句中作主语的从句", details: { form: ['That + 句子 + V + ...', 'What + 句子 + V + ...', '连接代词/副词 + 句子 + V + ...'], usage: '主语从句通常位于句首；为避免句子头重脚轻，常用it作形式主语，将真正的主语从句放在句末。', examples: ['<span class="italic">That he will come</span> is certain', '<span class="italic">What he said</span> is true', '<span class="italic">It is certain that he will come</span>'] } },
+            { id: 41, category: "句子结构", title: "宾语从句", difficulty: "B1", structure: "主语 + 谓语 + 连接词 + 句子", chineseExplanation: "在复合句中作宾语的从句", details: { form: ['S + V + that + 句子', 'S + V + what/which/who + 句子', 'S + V + when/where/why/how + 句子'], usage: '宾语从句可作动词、介词或形容词的宾语；that在口语中常省略；从句要用陈述句语序。', examples: ['I think <span class="italic">that he is right</span>', 'She asked <span class="italic">what I like</span>', 'I\'m interested in <span class="italic">where he lives</span>'] } },
+            { id: 42, category: "句子结构", title: "表语从句", difficulty: "B2", structure: "主语 + 系动词 + 连接词 + 句子", chineseExplanation: "在复合句中作表语的从句", details: { form: ['S + LinkV + that + 句子', 'S + LinkV + what/which/who + 句子', 'S + LinkV + when/where/why/how + 句子'], usage: '表语从句位于系动词之后；常用的系动词有be, become, seem, look等；连接词that不能省略。', examples: ['The fact is <span class="italic">that he is right</span>', 'My question is <span class="italic">what he wants</span>', 'This is <span class="italic">where I live</span>'] } },
+            { id: 43, category: "句子结构", title: "定语从句", difficulty: "B1", structure: "先行词 + 关系词 + 句子", chineseExplanation: "在复合句中作定语的从句", details: { form: ['先行词 + who/whom/whose + 句子 (指人)', '先行词 + which/whose + 句子 (指物)', '先行词 + that + 句子 (指人或物)'], usage: '定语从句修饰先行词；关系词指代先行词，并在从句中充当成分；限制性定语从句和非限制性定语从句用法不同。', examples: ['The man <span class="italic">who is standing there</span> is my teacher', 'The book <span class="italic">which I bought yesterday</span> is interesting', 'This is the best film <span class="italic">that I have ever seen</span>'] } },
+            { id: 44, category: "句子结构", title: "状语从句", difficulty: "B1", structure: "连接词 + 句子 + 主句 / 主句 + 连接词 + 句子", chineseExplanation: "在复合句中作状语的从句", details: { form: ['时间状语从句: when/while/as/before/after + 句子', '条件状语从句: if/unless/as long as + 句子', '原因状语从句: because/since/as + 句子', '结果状语从句: so...that/such...that + 句子'], usage: '状语从句可表示时间、条件、原因、结果、让步、方式、比较等；不同类型的状语从句由不同的连接词引导。', examples: ['<span class="italic">When I arrived</span>, he was reading', '<span class="italic">If it rains</span>, I will stay at home', 'He didn\'t go to school <span class="italic">because he was ill</span>'] } },
+            { id: 45, category: "句子结构", title: "直接引语与间接引语", difficulty: "B2", structure: "间接引语: 主句 + 连接词 + 宾语从句", chineseExplanation: "引用别人的话的两种方式", details: { form: ['直接引语: "..." (保留原话，加引号)', '间接引语: 主句 + that/if/whether/疑问词 + 句子 (转述原话，不加引号)'], usage: '间接引语通常构成宾语从句；人称、时态、指示代词、时间状语等要作相应变化；陈述句用that引导，疑问句用if/whether或疑问词引导。', examples: ['直接引语: He said, "I am a student"', '间接引语: He said <span class="italic">that he was a student</span>', '间接引语: She asked <span class="italic">if I liked English</span>'] } },
+            { id: 46, category: "句子结构", title: "倒装句", difficulty: "B2", structure: "谓语 + 主语 / 助动词 + 主语 + 谓语", chineseExplanation: "将谓语动词或助动词提到主语之前的句子", details: { form: ['完全倒装: 谓语 + 主语 (here/there开头等)', '部分倒装: 助动词 + 主语 + 谓语 (否定词开头等)', '强调倒装: So + adj./adv. + 助动词 + 主语 + 谓语'], usage: '倒装句用于强调、平衡句子结构或符合某些语法要求；常见于以here/there,否定词,only+状语等开头的句子。', examples: ['<span class="italic">Here comes</span> the bus', '<span class="italic">Never have I</span> seen such a beautiful place', '<span class="italic">So fast does he</span> run'] } },
+            { id: 47, category: "句子结构", title: "强调句", difficulty: "B2", structure: "It is/was + 被强调部分 + that/who + 其他成分", chineseExplanation: "强调句子某一成分的句子", details: { form: ['强调主语: It is/was + 主语 + that/who + V + ...', '强调宾语: It is/was + 宾语 + that + S + V + ...', '强调状语: It is/was + 状语 + that + S + V + ...'], usage: '强调句可强调句子的主语、宾语、状语等成分；被强调部分指人时可用who，其他情况用that；去掉It is/was和that/who后，句子仍完整。', examples: ['<span class="italic">It is he who</span> helped me', '<span class="italic">It is English that</span> I like best', '<span class="italic">It was yesterday that</span> I met him'] }},
+
+            // 五、冠词 (A1-B1, 4张)
+            { id: 48, category: "冠词", title: "不定冠词", difficulty: "A1", structure: "a + 辅音音素开头的单词；an + 元音音素开头的单词", chineseExplanation: "表示泛指的冠词", details: { form: ['a: 用于辅音音素开头的单词前', 'an: 用于元音音素开头的单词前', '复数/不可数名词前不用'], usage: '表示泛指的人或事物中的一个；表示一类人或事物；用于某些固定搭配中；第一次提到某人或某物时用。', examples: ['I have <span class="italic">a</span> book', 'She is <span class="italic">an</span> English teacher', 'He is <span class="italic">a</span> student'] } },
+            { id: 49, category: "冠词", title: "定冠词", difficulty: "A1", structure: "the + 名词", chineseExplanation: "表示特指的冠词", details: { form: ['the + 名词 (单复数均可)'], usage: '表示特指的人或事物；表示双方都知道的人或事物；表示世界上独一无二的事物；用于序数词、形容词最高级前；用于乐器名称前。', examples: ['<span class="italic">The</span> book on the desk is mine', 'We go to <span class="italic">the</span> school by bus', 'He plays <span class="italic">the</span> piano'] } },
+            { id: 50, category: "冠词", title: "零冠词", difficulty: "A2", structure: "名词前不加冠词", chineseExplanation: "名词前不使用冠词的情况", details: { form: ['复数名词表示泛指', '不可数名词表示泛指', '专有名词', '三餐、球类运动前'], usage: '复数名词和不可数名词表示泛指时；专有名词前；三餐、球类运动前；某些固定搭配中。', examples: ['I like <span class="italic">books</span>', 'She drinks <span class="italic">water</span>', 'We have <span class="italic">breakfast</span> in the morning'] } },
+            { id: 51, category: "冠词", title: "冠词的特殊用法", difficulty: "B1", structure: "固定搭配中的冠词使用", chineseExplanation: "冠词在一些特殊情况下的使用规则", details: { form: ['同一事物: the + 名词 + and + 名词', '不同事物: a + 名词 + and + a + 名词', 'by + 交通工具: by + 名词 (零冠词)'], usage: '同一人或事物前用一个冠词；不同人或事物前分别用冠词；by+交通工具名词前不加冠词；某些固定短语中冠词的习惯用法。', examples: ['He is <span class="italic">the</span> teacher and writer', 'He is <span class="italic">a</span> teacher and <span class="italic">a</span> writer', 'I go to school <span class="italic">by bus</span>'] } },
+
+            // 六、介词 (A1-B1, 5张)
+            { id: 52, category: "介词", title: "时间介词", difficulty: "A1", structure: "at/in/on + 时间", chineseExplanation: "表示时间的介词", details: { form: ['at + 具体时刻/节日', 'in + 年/月/季节/上午/下午/晚上', 'on + 具体日期/星期/具体某天的上午/下午/晚上'], usage: 'at用于具体时刻、节日；in用于较长的时间，如年、月、季节、上午、下午、晚上；on用于具体日期、星期、具体某天的上午、下午、晚上。', examples: ['I get up <span class="italic">at</span> 7:00', 'She was born <span class="italic">in</span> 2000', 'We will go <span class="italic">on</span> Sunday'] } },
+            { id: 53, category: "介词", title: "地点介词", difficulty: "A1", structure: "at/in/on + 地点", chineseExplanation: "表示地点的介词", details: { form: ['at + 小地点', 'in + 大地点/空间内部', 'on + 表面/线上'], usage: 'at用于小地点；in用于大地点或空间内部；on用于表面或线上；to表示方向，into表示进入，out of表示出来。', examples: ['He is <span class="italic">at</span> the station', 'She lives <span class="italic">in</span> Beijing', 'The book is <span class="italic">on</span> the desk'] } },
+            { id: 54, category: "介词", title: "方式介词", difficulty: "A2", structure: "by/with/in + 方式", chineseExplanation: "表示方式的介词", details: { form: ['by + 交通工具/手段', 'with + 工具/身体部位', 'in + 语言/材料/方式'], usage: 'by表示通过某种交通工具或手段；with表示使用某种工具或身体部位；in表示使用某种语言、材料或方式。', examples: ['I go to school <span class="italic">by bus</span>', 'He writes <span class="italic">with a pen</span>', 'She speaks <span class="italic">in English</span>'] } },
+            { id: 55, category: "介词", title: "介词短语", difficulty: "B1", structure: "介词 + 名词/代词/动名词", chineseExplanation: "由介词和其宾语构成的短语", details: { form: ['介词 + 名词', '介词 + 代词', '介词 + 动名词'], usage: '介词短语在句中可作定语、状语、表语或宾语补足语；不同的介词有不同的搭配和意义。', examples: ['The book <span class="italic">on the desk</span> is mine', 'He came <span class="italic">in the morning</span>', 'I\'m interested <span class="italic">in reading</span>'] } },
+            { id: 56, category: "介词", title: "常见介词辨析", difficulty: "B1", structure: "易混淆介词的用法区别", chineseExplanation: "意义或用法相近的介词之间的区别", details: { form: ['between/among: 两者之间/三者或三者以上之间', 'in/into: 在里面/进入', 'on/above/over: 在上面/在上方/在正上方'], usage: 'between用于两者之间，among用于三者或三者以上之间；in表示在里面，into表示进入的动作；on表示在表面上，above表示在上方(不一定垂直)，over表示在正上方。', examples: ['She sits <span class="italic">between</span> Tom and Mary', 'He went <span class="italic">into</span> the room', 'The lamp is <span class="italic">over</span> the table'] } },
+
+            // 七、形容词副词 (A1-B2, 6张)
+            { id: 57, category: "形容词副词", title: "形容词的用法", difficulty: "A1", structure: "形容词 + 名词 / be + 形容词", chineseExplanation: "修饰名词或作表语的词", details: { form: ['定语: 形容词 + 名词', '表语: be + 形容词', '宾语补足语: 动词 + 宾语 + 形容词'], usage: '形容词修饰名词作定语；放在系动词后作表语；放在宾语后作宾语补足语；大多数形容词既可作定语也可作表语。', examples: ['a <span class="italic">beautiful</span> girl', 'She is <span class="italic">happy</span>', 'I find it <span class="italic">easy</span>'] } },
+            { id: 58, category: "形容词副词", title: "副词的用法", difficulty: "A1", structure: "副词 + 动词/形容词/副词/句子", chineseExplanation: "修饰动词、形容词、副词或整个句子的词", details: { form: ['修饰动词: 副词 + 动词 / 动词 + 副词', '修饰形容词: 副词 + 形容词', '修饰副词: 副词 + 副词', '修饰句子: 副词 + 句子'], usage: '副词主要用来修饰动词、形容词、副词或整个句子；表示时间、地点、方式、程度、频率等；大多数副词由形容词加ly构成。', examples: ['He runs <span class="italic">fast</span>', 'She is <span class="italic">very</span> happy', 'He speaks <span class="italic">English very well</span>'] } },
+            { id: 59, category: "形容词副词", title: "形容词比较级和最高级", difficulty: "A2", structure: "比较级: 形容词 + er / more + 形容词", chineseExplanation: "表示形容词比较等级的形式", details: { form: ['原级: as + 形容词 + as', '比较级: 形容词 + er / more + 形容词 + than', '最高级: the + 形容词 + est / the most + 形容词'], usage: '原级表示两者相等；比较级表示两者比较，一方比另一方更...；最高级表示三者或三者以上比较，最...；不同音节的形容词有不同的构成方式。', examples: ['He is <span class="italic">as tall as</span> me', 'She is <span class="italic">taller than</span> me', 'He is <span class="italic">the tallest</span> in the class'] } },
+            { id: 60, category: "形容词副词", title: "副词比较级和最高级", difficulty: "A2", structure: "比较级: 副词 + er / more + 副词", chineseExplanation: "表示副词比较等级的形式", details: { form: ['原级: as + 副词 + as', '比较级: 副词 + er / more + 副词 + than', '最高级: the + 副词 + est / the most + 副词'], usage: '副词比较等级的构成和用法与形容词基本相同；单音节副词加er/est，多音节副词加more/most；最高级前的the常可省略。', examples: ['He runs <span class="italic">as fast as</span> me', 'She runs <span class="italic">faster than</span> me', 'He runs <span class="italic">(the) fastest</span> in the class'] } },
+            { id: 61, category: "形容词副词", title: "形容词副词的位置", difficulty: "B1", structure: "形容词通常前置；副词位置灵活", chineseExplanation: "形容词和副词在句中的位置", details: { form: ['形容词: 通常位于名词前；不定代词后', '副词: 修饰动词可位于动词前、后或句首；修饰形容词/副词位于被修饰词前；修饰句子位于句首或句尾'], usage: '形容词通常位于所修饰的名词前，修饰不定代词时位于其后；副词位置较灵活，不同类型的副词位置不同。', examples: ['a <span class="italic">beautiful</span> girl', 'something <span class="italic">interesting</span>', 'He <span class="italic">often</span> goes to school early'] } },
+            { id: 62, category: "形容词副词", title: "常见形容词副词辨析", difficulty: "B2", structure: "易混淆形容词副词的用法区别", chineseExplanation: "意义或用法相近的形容词副词之间的区别", details: { form: ['good/well: good是形容词，well是副词(身体好时是形容词)', 'hard/hardly: hard努力地，hardly几乎不', 'late/lately: late晚，lately最近'], usage: 'good是形容词，修饰名词；well是副词，修饰动词，作表语时表示身体好；hard表示努力地，hardly表示几乎不；late表示晚，lately表示最近。', examples: ['He is a <span class="italic">good</span> student', 'He plays basketball <span class="italic">well</span>', 'I <span class="italic">hardly</span> know him'] } },
+
+            // 八、数词 (A1-A2, 3张)
+            { id: 63, category: "数词", title: "基数词", difficulty: "A1", structure: "one/two/three...", chineseExplanation: "表示数量的数词", details: { form: ['1-12: one, two, ..., twelve', '13-19: thirteen, ..., nineteen', '20-90: twenty, thirty, ..., ninety', '百: hundred, 千: thousand, 万: ten thousand'], usage: '基数词表示数量；百、千、万等单位前有具体数字时，不加s；表示概数时，加s并与of连用。', examples: ['I have <span class="italic">three</span> books', 'There are <span class="italic">two hundred</span> students', 'Thousands of <span class="italic">people</span> came'] } },
+            { id: 64, category: "数词", title: "序数词", difficulty: "A1", structure: "first/second/third...", chineseExplanation: "表示顺序的数词", details: { form: ['1st: first, 2nd: second, 3rd: third, 4th: fourth', '11th: eleventh, 12th: twelfth, 13th: thirteenth', '20th: twentieth, 21st: twenty-first'], usage: '序数词表示顺序；通常前面要加定冠词the；可作定语、表语、宾语等；缩写形式由阿拉伯数字加序数词的最后两个字母构成。', examples: ['He is <span class="italic">the first</span> in the class', 'This is my <span class="italic">second</span> book', 'May <span class="italic">1st</span> is Labor Day'] } },
+            { id: 65, category: "数词", title: "数词的用法", difficulty: "A2", structure: "数词 + 名词 / 名词 + 数词", chineseExplanation: "数词在句中的用法", details: { form: ['表示年龄: 基数词 + years old / at the age of + 基数词', '表示日期: 月 + 日(序数词)', '表示时间: 小时:分钟 / 分钟 past/to 小时', '表示编号: 名词 + 基数词 / the + 序数词 + 名词'], usage: '数词可表示年龄、日期、时间、编号、数量等；表示编号时，名词+基数词和the+序数词+名词两种结构可互换。', examples: ['He is <span class="italic">10 years old</span>', 'Today is <span class="italic">May 1st</span>', 'It is <span class="italic">two o\'clock</span>', 'I am in <span class="italic">Class One</span> / <span class="italic">the first class</span>'] } },
+
+            // 九、连词 (A1-B1, 4张)
+            { id: 66, category: "连词", title: "并列连词", difficulty: "A1", structure: "and/or/but/so/for", chineseExplanation: "连接并列成分的连词", details: { form: ['表示并列: and', '表示选择: or', '表示转折: but', '表示因果: so, for'], usage: '并列连词连接两个或多个并列的单词、短语或句子；and表示并列或顺承，or表示选择，but表示转折，so表示结果，for表示原因。', examples: ['I like tea <span class="italic">and</span> coffee', 'You can go <span class="italic">or</span> stay', 'He is tired <span class="italic">but</span> he keeps working'] } },
+            { id: 67, category: "连词", title: "从属连词", difficulty: "B1", structure: "引导从句的连词", chineseExplanation: "引导从句的连词", details: { form: ['引导名词性从句: that, if, whether, what, when', '引导定语从句: who, which, that, where, when', '引导状语从句: when, if, because, although, than'], usage: '从属连词引导从句，连接主句和从句；不同类型的从句由不同的从属连词引导；从属连词在从句中不充当句子成分(关系代词和关系副词除外)。', examples: ['I know <span class="italic">that he is right</span>', 'The man <span class="italic">who is standing there</span> is my teacher', '<span class="italic">When I arrived</span>, he was reading'] } },
+            { id: 68, category: "连词", title: "关联连词", difficulty: "B1", structure: "both...and..., either...or...等", chineseExplanation: "成对使用的连词", details: { form: ['both...and...: 两者都', 'either...or...: 要么...要么...', 'neither...nor...: 既不...也不...', 'not only...but also...: 不仅...而且...'], usage: '关联连词成对使用，连接两个并列的成分；连接两个主语时，谓语动词的数要与最近的主语保持一致(either...or..., neither...nor..., not only...but also...)。', examples: ['<span class="italic">Both he and I</span> are students', '<span class="italic">Either you or he</span> is right', '<span class="italic">Not only he but also I</span> like English'] } },
+            { id: 69, category: "连词", title: "连词的区别", difficulty: "B1", structure: "易混淆连词的用法差异", chineseExplanation: "意义或用法相近的连词之间的区别", details: { form: ['because/since/as: 语气由强到弱，表示原因', 'though/although/even though: 虽然，表示让步', 'if/whether: 是否，if还可表示如果'], usage: 'because表示直接原因，语气最强，可回答why；since/as表示已知的原因，语气较弱；though/although表示让步，though可用于句末；if和whether表示是否时，在某些情况下可互换，但whether可与or not连用，if不可。', examples: ['I didn\'t go <span class="italic">because</span> I was ill', '<span class="italic">Though</span> he is young, he knows a lot', 'I don\'t know <span class="italic">whether</span> he will come or not'] } },
+
+            // 十、特殊句式与结构 (A2-B2, 7张)
+            { id: 70, category: "特殊句式与结构", title: "There be句型", difficulty: "A2", structure: "There be + 主语 + 状语", chineseExplanation: "表示某地有某物的句型", details: { form: ['肯定式: There is/are + 主语 + ...', '否定式: There is/are not + 主语 + ...', '疑问式: Is/Are there + 主语 + ...?'], usage: 'There be句型表示某地有某物；be动词的单复数形式取决于后面的主语；多个主语时，be动词与最近的主语保持一致；表示存在，区别于have表示拥有。', examples: ['<span class="italic">There is</span> a book on the desk', '<span class="italic">There are</span> two books on the desk', '<span class="italic">Is there</span> a book on the desk?'] } },
+            { id: 71, category: "特殊句式与结构", title: "It的用法", difficulty: "B1", structure: "It + be + 形容词/名词 + to do sth.", chineseExplanation: "代词it的各种用法", details: { form: ['指代上文提到的事物', '作形式主语: It + be + adj./n. + to do sth./that从句', '作形式宾语: 动词 + it + adj./n. + to do sth./that从句', '表示时间、天气、距离等'], usage: 'it可指代上文提到的事物；作形式主语或形式宾语，代替不定式或从句；表示时间、天气、距离等；用于强调句中。', examples: ['I have a book, <span class="italic">it</span> is interesting', '<span class="italic">It</span> is important <span class="italic">to learn English</span>', '<span class="italic">It</span> is raining'] } },
+            { id: 72, category: "特殊句式与结构", title: "比较结构", difficulty: "B1", structure: "as...as..., more...than..., the most...", chineseExplanation: "表示比较的结构", details: { form: ['原级比较: as + adj./adv. + as', '比较级比较: more + adj./adv. + than', '最高级比较: the most + adj./adv.', '倍数表达: 倍数 + as...as... / 倍数 + 比较级 + than'], usage: 'as...as...表示和...一样，否定形式为not as/so...as...；more...than...表示比...更...；the most...表示最...；倍数表达有多种结构。', examples: ['He is <span class="italic">as tall as</span> me', 'She is <span class="italic">more beautiful than</span> her sister', 'This room is <span class="italic">twice as big as</span> that one'] } },
+            { id: 73, category: "特殊句式与结构", title: "否定结构", difficulty: "B1", structure: "not/no/never/hardly等表示否定", chineseExplanation: "表示否定的各种结构", details: { form: ['be动词 + not', '助动词 + not + 动词原形', 'no + 名词', 'never/hardly/scarcely等否定副词', 'too...to...: 太...而不能...'], usage: '否定句通常在be动词、助动词或情态动词后加not；no可直接修饰名词，表示没有；never等否定副词表示完全否定；too...to...结构表示否定意义。', examples: ['He <span class="italic">is not</span> a student', 'She <span class="italic">doesn\'t like</span> coffee', 'There is <span class="italic">no</span> water', 'He <span class="italic">never</span> goes there', 'It is <span class="italic">too hot to</span> go out'] } },
+            { id: 74, category: "特殊句式与结构", title: "省略句", difficulty: "B2", structure: "省略句子中某些成分的句子", chineseExplanation: "省略句子中某些成分的句子", details: { form: ['省略主语: (You) Open the door', '省略谓语: He is taller than I (am)', '省略宾语: I like English, and she likes (English) too', '省略状语从句中的主语和be动词: When (I am) reading, I like to listen to music'], usage: '为了避免重复或使句子简洁，常省略句子中某些成分；省略的成分通常是上下文已经明确的内容；状语从句中，如果主语和主句主语一致且含有be动词，常省略主语和be动词。', examples: ['<span class="italic">Open</span> the door', 'He is taller than <span class="italic">I</span>', '<span class="italic">When reading</span>, I like to listen to music'] } },
+            { id: 75, category: "特殊句式与结构", title: "插入语", difficulty: "B2", structure: "插入在句子中间的成分", chineseExplanation: "插入在句子中间，对句子进行补充说明的成分", details: { form: ['副词: however, actually, certainly', '短语: in fact, of course, for example', '从句: I think, I believe, as far as I know'], usage: '插入语与句子其他成分没有语法上的联系，去掉后句子仍然完整；通常用逗号与句子其他成分隔开；可位于句首、句中或句尾。', examples: ['He, <span class="italic">however</span>, didn\'t agree', '<span class="italic">In fact</span>, he is a good student', 'He will come, <span class="italic">I think</span>'] } },
+            { id: 76, category: "特殊句式与结构", title: "独立主格结构", difficulty: "B2", structure: "逻辑主语 + 非谓语动词/形容词/副词/介词短语", chineseExplanation: "带有逻辑主语的短语结构", details: { form: ['名词/代词 + 现在分词', '名词/代词 + 过去分词', '名词/代词 + 形容词/副词/介词短语'], usage: '独立主格结构有自己的逻辑主语，与主句主语不同；在句中作状语，表示时间、原因、条件、伴随等；逻辑主语与后面的成分构成主谓关系或动宾关系。', examples: ['<span class="italic">Weather permitting</span>, we will go out', '<span class="italic">The work done</span>, we went home', '<span class="italic">He entered the room, his face red</span>'] } },
+
+            // 十一、学术英语模块 (C1-C2, 5张)
+            { id: 77, category: "学术英语", title: "分词独立主格结构", difficulty: "C1", structure: "逻辑主语 + 分词短语", chineseExplanation: "学术论文中用于表示伴随或条件的独立结构", details: { form: ['名词 + 现在分词: The data having been collected, we began analysis', '名词 + 过去分词: The experiment completed, the results were published', '名词 + 形容词短语: The hypothesis correct, the research proceeded'], usage: '用于学术写作中表示时间、条件、原因或伴随情况；避免使用过多并列句，增强句式多样性；逻辑主语与主句主语不同。', examples: ['<span class="italic">The samples being prepared</span>, the next step was measurement', '<span class="italic">All variables controlled</span>, the experiment showed consistent results', '<span class="italic">The theory proven valid</span>, further research can be conducted'] } },
+            { id: 78, category: "学术英语", title: "名词化结构", difficulty: "C1", structure: "动词/形容词 + 名词后缀 (tion/sion/ment等)", chineseExplanation: "学术写作中把动词或形容词转化为名词的表达", details: { form: ['动词名词化: analyze → analysis, develop → development', '形容词名词化: different → difference, important → importance', '短语名词化: investigate → investigation into, compare → comparison between'], usage: '增加文本的正式性和客观性；常用于学术论文的标题、摘要和结论部分；可使表达更简洁紧凑。', examples: ['<span class="italic">Analysis of</span> the data revealed significant patterns', '<span class="italic">Comparison between</span> the two methods showed distinct advantages', '<span class="italic">Development of</span> new algorithms improved efficiency'] } },
+            { id: 79, category: "学术英语", title: "引用句式", difficulty: "C1", structure: "引用标记 + 来源 + 内容", chineseExplanation: "学术写作中引用他人研究成果的标准句式", details: { form: ['直接引用: Smith (2020) stated, "..."', '间接引用: Smith (2020) argued that ...', '强调结果: The findings indicate that ... (Jones, 2021)'], usage: '所有引用必须注明来源；直接引用需加引号并注明页码；间接引用需用自己的话转述并注明作者和年份；遵循特定引用格式（APA/MLA等）。', examples: ['<span class="italic">As Brown (2019) noted</span>, "climate change impacts are accelerating" (p. 45)', '<span class="italic">Research by Lee et al. (2022) demonstrated</span> a correlation between variables', '<span class="italic">The methodology employed</span> follows the framework established by Wang (2020)'] } },
+            { id: 80, category: "学术英语", title: "假设条件句", difficulty: "C2", structure: "If + 过去完成时, would/could + have + 过去分词", chineseExplanation: "学术论文中讨论假设情况或未实现条件的复杂句式", details: { form: ['与过去事实相反: If the parameters had been adjusted, results would have differed', '与现在事实相反: If the model were accurate, predictions would match observations', '未来可能性: Should new data emerge, further analysis will be required'], usage: '用于讨论替代方案、假设情景或未实现的可能性；在学术讨论和结论部分常用；表达委婉的批评或建议。', examples: ['<span class="italic">If the sample size had been larger</span>, the results could have been more significant', '<span class="italic">Should funding become available</span>, this research could be expanded', '<span class="italic">Had the initial assumptions been validated</span>, subsequent errors might have been avoided'] } },
+            { id: 81, category: "学术英语", title: "限定性定语从句", difficulty: "C1", structure: "名词 + which/that + 学术内容", chineseExplanation: "学术写作中用于精确定义概念的复杂从句", details: { form: ['定义概念: A phenomenon which occurs when...', '描述方法: The technique that was employed to...', '解释结果: Results which indicate a correlation between...'], usage: '用于精确定义学术概念、方法或结果；避免过度使用简单句；增强文本的严谨性和专业性。', examples: ['<span class="italic">Quantum entanglement</span>, which is a phenomenon in quantum mechanics, describes the correlation between particles', '<span class="italic">The spectrophotometric method</span> that was used to measure concentration yielded precise results', '<span class="italic">The hypothesis</span> which was proposed in the introduction requires further validation'] } },
+
+            // 十二、商务英语专题 (B2-C1, 5张)
+            { id: 82, category: "商务英语", title: "条件句委婉表达", difficulty: "B2", structure: "Should you.../Would you consider...", chineseExplanation: "商务沟通中表达请求或建议的委婉条件句", details: { form: ['提出建议: Should you require further information, please contact us', '请求行动: Would you consider extending the deadline by two days?', '表达可能性: In the event that the project is delayed, we will notify you immediately'], usage: '用于商务邮件和正式沟通中；比直接命令更礼貌；表达专业和尊重；常用于提出请求、建议或说明条件。', examples: ['<span class="italic">Should you wish to proceed</span>, please sign and return the attached document', '<span class="italic">Would you be interested in attending</span> our upcoming conference?', '<span class="italic">In case of any discrepancies</span>, kindly inform our accounts department immediately'] } },
+            { id: 83, category: "商务英语", title: "报告常用句式", difficulty: "B2", structure: "As can be seen from.../It should be noted that...", chineseExplanation: "商务报告中常用的正式表达方式", details: { form: ['描述数据: As can be seen from Figure 1, sales have increased by 15%', '指出重点: It should be noted that profit margins have declined slightly', '提出建议: It is recommended that we implement the new policy next quarter'], usage: '用于商务报告、演示文稿和正式文档；使表达更客观和专业；常用于描述数据、指出重点或提出建议。', examples: ['<span class="italic">As indicated in the quarterly report</span>, our market share has grown by 8%', '<span class="italic">It is important to highlight that</span> customer satisfaction ratings have improved', '<span class="italic">Based on the analysis, it is proposed that</span> we expand into Asian markets'] } },
+            { id: 84, category: "商务英语", title: "谈判句型", difficulty: "C1", structure: "We would be prepared to.../We could consider...", chineseExplanation: "商务谈判中表达灵活性和条件的句型", details: { form: ['表达让步: We would be prepared to offer a 5% discount for bulk orders', '提出条件: We could consider extending the payment terms if you increase your order quantity', '拒绝提议: While we appreciate your offer, we are unable to accept the proposed timeline'], usage: '用于商务谈判和协商中；表达灵活性同时设定边界；既礼貌又坚定；为双方保留谈判空间。', examples: ['<span class="italic">We would be willing to adjust the delivery schedule</span> provided that payment terms remain unchanged', '<span class="italic">In exchange for a longer contract period</span>, we could offer a more competitive rate', '<span class="italic">Our position is that we cannot compromise on quality</span>, though we may be flexible on pricing'] } },
+            { id: 85, category: "商务英语", title: "会议用语", difficulty: "B2", structure: "Could we move on to.../I'd like to draw attention to...", chineseExplanation: "商务会议中引导讨论和表达观点的常用句型", details: { form: ['引导议题: Could we move on to the next agenda item?', '强调重点: I\'d like to draw attention to our declining profit margins', '征求意见: What are your thoughts on the proposed marketing strategy?'], usage: '用于正式商务会议中；有效引导讨论流程；表达观点和征求意见；维持会议效率和焦点。', examples: ['<span class="italic">If we could return to the previous point</span>, I believe we need to address the budget constraints', '<span class="italic">To summarize the key decisions</span>, we agreed to proceed with the new supplier', '<span class="italic">Before we conclude</span>, does anyone have any final comments or concerns?'] } },
+            { id: 86, category: "商务英语", title: "投诉与回应", difficulty: "B2", structure: "We regret to inform you that.../We apologize for...", chineseExplanation: "商务场景中处理投诉和表达歉意的正式句型", details: { form: ['提出投诉: We regret to inform you that the delivered goods do not meet our specifications', '表达歉意: We apologize for the inconvenience caused by the delayed shipment', '解决方案: We propose to refund 30% of the purchase price as compensation'], usage: '用于处理客户投诉和服务问题；保持专业和礼貌；明确表达歉意并提出解决方案；维护客户关系。', examples: ['<span class="italic">We regret to advise that</span> your order will be delayed by three business days', '<span class="italic">Please accept our sincere apologies for</span> the error in your invoice', '<span class="italic">To resolve this matter promptly</span>, we will dispatch a replacement unit tomorrow'] } },
+
+            // 十三、语法对比附录 (B1-C1, 5张)
+            { id: 87, category: "语法对比", title: "时态概念差异", difficulty: "B1", structure: "英语时态 vs 汉语时间状语", chineseExplanation: "英语通过动词时态表达时间，汉语通过时间状语", details: { form: ['英语: I <span class="font-bold">have lived</span> here for 5 years (动词时态)', '汉语: 我在这里住了5年了 (时间状语+动态助词)', '英语: She <span class="font-bold">will be working</span> when you arrive (复杂时态)', '汉语: 你到的时候她会在工作 (时间状语从句)'], usage: '英语必须通过动词时态变化表达时间关系；汉语主要通过时间状语和动态助词("了"、"过"、"着")表达；英语时态包含更多细微时间差别。', examples: ['英语: He <span class="italic">has been studying</span> English for 3 years (现在完成进行时)', '汉语: 他学英语已经3年了 (时间状语"已经")', '英语: I <span class="italic">was reading</span> when she called (过去进行时)', '汉语: 她打电话的时候我正在看书 (时间状语从句+动态助词"正")'] } },
+            { id: 88, category: "语法对比", title: "被动语态使用", difficulty: "B2", structure: "英语被动 vs 汉语主动表达", chineseExplanation: "英语频繁使用被动语态，汉语倾向主动表达", details: { form: ['英语被动: The experiment <span class="font-bold">was conducted</span> in 2023', '汉语主动: 2023年进行了这项实验', '英语被动: It <span class="font-bold">is believed that</span> climate change is accelerating', '汉语主动: 人们认为气候变化正在加速'], usage: '英语学术和正式文体中大量使用被动语态以强调客观性；汉语即使表达被动意义也常使用主动句式；汉语可用"被"、"由"等词表达被动，但使用频率低于英语。', examples: ['英语: The report <span class="italic">was submitted</span> yesterday (被动语态)', '汉语: 报告昨天提交了 (主动形式表达被动意义)', '英语: A new policy <span class="italic">will be implemented</span> next month (被动语态)', '汉语: 下个月将实施新政策 (主动形式表达被动意义)'] } },
+            { id: 89, category: "语法对比", title: "定语位置差异", difficulty: "B1", structure: "英语后置定语 vs 汉语前置定语", chineseExplanation: "英语定语常后置，汉语定语通常前置", details: { form: ['英语: a study <span class="font-bold">on climate change</span> (介词短语后置)', '汉语: 一项关于气候变化的研究 (前置定语)', '英语: the factors <span class="font-bold">affecting economic growth</span> (分词短语后置)', '汉语: 影响经济增长的因素 (前置定语)'], usage: '英语中短语和从句作定语时通常后置；汉语定语无论长短几乎都前置；长定语在英语中后置可使句子结构更平衡。', examples: ['英语: students <span class="italic">majoring in computer science</span> (分词短语后置)', '汉语: 计算机科学专业的学生 (前置定语)', '英语: the house <span class="italic">where I was born</span> (定语从句后置)', '汉语: 我出生的那所房子 (前置定语从句)'] } },
+            { id: 90, category: "语法对比", title: "虚拟语气差异", difficulty: "C1", structure: "英语虚拟语气 vs 汉语假设表达", chineseExplanation: "英语有专门虚拟语气，汉语通过词汇表达假设", details: { form: ['英语: If I <span class="font-bold">were</span> you, I <span class="font-bold">would go</span> (动词形态变化)', '汉语: 如果我是你，我会去 (词汇"如果"表达假设)', '英语: I <span class="font-bold">wish I had studied</span> harder (特殊动词形态)', '汉语: 我希望当初学习更努力 (时间副词"当初"表达与事实相反)'], usage: '英语虚拟语气通过动词形态变化(were, had done, would do)表达与事实相反的假设；汉语主要通过词汇手段("如果"、"要是"、"假如")和上下文表达假设意义；英语虚拟语气时态变化更系统和复杂。', examples: ['英语: If he <span class="italic">had arrived</span> on time, we <span class="italic">would have caught</span> the train (过去虚拟)', '汉语: 要是他按时到，我们就能赶上火车了 (词汇"要是"表达假设)', '英语: It <span class="italic">is important that she <span class="font-bold">be</span> informed immediately</span> (should省略的虚拟)', '汉语: 重要的是应该立即通知她 (情态动词"应该"表达建议)'] } },
+            { id: 91, category: "语法对比", title: "量词使用差异", difficulty: "A2", structure: "英语冠词 vs 汉语量词", chineseExplanation: "英语使用冠词(a/an/the)，汉语使用量词(个/本/只等)", details: { form: ['英语: a book / an apple / the pen (冠词)', '汉语: 一本书 / 一个苹果 / 这支笔 (量词)', '英语: some water / much information (无冠词)', '汉语: 一些水 / 很多信息 (量词)'], usage: '英语有冠词系统(a/an/the)，汉语没有；汉语几乎所有名词前都需要量词，英语通常不需要；英语不可数名词前不加冠词表示泛指，汉语仍需量词。', examples: ['英语: I bought <span class="italic">a car</span> yesterday (不定冠词)', '汉语: 我昨天买了一辆车 (量词"辆")', '英语: She has <span class="italic">three children</span> (无冠词)', '汉语: 她有三个孩子 (量词"个")', '英语: He drinks <span class="italic">coffee</span> every morning (无冠词)', '汉语: 他每天早上喝咖啡 (量词省略但隐含"杯")'] } }
+        ];
+
+        // 当前卡片索引
+        let currentIndex = 0;
+        // 用户收藏
+        let favorites = JSON.parse(localStorage.getItem('grammarFavorites')) || [];
+
+        // DOM元素
+        const card = document.getElementById('card');
+        const favoriteBtnFront = document.getElementById('favoriteBtnFront');
+        const cardIndex = document.getElementById('cardIndex');
+        const cardIndexBack = document.getElementById('cardIndexBack');
+        const grammarCategory = document.getElementById('grammarCategory');
+        const grammarTitle = document.getElementById('grammarTitle');
+        const grammarStructure = document.getElementById('grammarStructure');
+        const chineseExplanation = document.getElementById('chineseExplanation');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailContent = document.getElementById('detailContent');
+
+        // 初始化
+        function init() {
+            renderCard();
+            setupEventListeners();
+            loadProgress();
+        }
+
+        // 渲染卡片内容
+        function renderCard() {
+            const item = grammarData[currentIndex];
+            if (!item) return;
+
+            // 更新正面
+            grammarCategory.textContent = item.category;
+            grammarTitle.textContent = item.title;
+            grammarStructure.innerHTML = `<span class="text-lg">${item.structure}</span>`;
+            chineseExplanation.textContent = item.chineseExplanation;
+
+            // 更新背面
+            detailTitle.textContent = `${item.title}详解`;
+            detailContent.innerHTML = `
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">构成形式</h4>
+                    <ul class="list-disc list-inside space-y-1 pl-2 text-sm">
+                        ${item.details.form.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">用法说明</h4>
+                    <p>${item.details.usage}</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">例句</h4>
+                    <ul class="list-disc list-inside space-y-1 pl-2 text-sm">
+                        ${item.details.examples.map(e => `<li>${e}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // 更新索引
+            const total = grammarData.length;
+            cardIndex.textContent = `卡片 ${currentIndex + 1}/${total}`;
+            cardIndexBack.textContent = `卡片 ${currentIndex + 1}/${total}`;
+
+            // 更新收藏状态
+            updateFavoriteButton();
+        }
+
+        // 更新收藏按钮状态
+        function updateFavoriteButton() {
+            const isFavorite = favorites.includes(grammarData[currentIndex].id);
+            const iconFront = favoriteBtnFront.querySelector('i');
+            
+            // 更新正面按钮
+            if (isFavorite) {
+                iconFront.classList.remove('fa-heart-o');
+                iconFront.classList.add('fa-heart', 'text-red-500');
+            } else {
+                iconFront.classList.remove('fa-heart', 'text-red-500');
+                iconFront.classList.add('fa-heart-o');
+            }
+        }
+
+        // 切换收藏状态
+        function toggleFavorite() {
+            const id = grammarData[currentIndex].id;
+            const index = favorites.indexOf(id);
+            if (index === -1) {
+                favorites.push(id);
+            } else {
+                favorites.splice(index, 1);
+            }
+            localStorage.setItem('grammarFavorites', JSON.stringify(favorites));
+            updateFavoriteButton();
+        }
+
+        // 导航到指定卡片
+        function navigate(direction) {
+            // 使用取模运算实现循环导航
+            // 公式说明：(当前索引 + 方向 + 总长度) % 总长度
+            // 加上总长度是为了避免负数取模的问题
+            currentIndex = (currentIndex + direction + grammarData.length) % grammarData.length;
+            // 重置卡片翻转状态
+            card.classList.remove('flipped');
+            // 重新渲染卡片内容
+            renderCard();
+            // 保存当前进度
+            saveProgress();
+        }
+
+        // 保存学习进度
+        function saveProgress() {
+            localStorage.setItem('grammarProgress', currentIndex);
+        }
+
+        // 加载学习进度
+        function loadProgress() {
+            const savedIndex = localStorage.getItem('grammarProgress');
+            if (savedIndex !== null) {
+                currentIndex = parseInt(savedIndex);
+                renderCard();
+            }
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 导航按钮
+            document.querySelectorAll('[data-action]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const action = e.currentTarget.dataset.action;
+                    switch (action) {
+                        case 'prev':
+                            navigate(-1);
+                            break;
+                        case 'next':
+                            navigate(1);
+                            break;
+                        case 'flip':
+                            card.classList.toggle('flipped');
+                            break;
+                    }
+                });
+            });
+
+            // 收藏按钮（仅正面）
+            favoriteBtnFront.addEventListener('click', toggleFavorite);
+
+            // 键盘导航
+            document.addEventListener('keydown', (e) => {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        navigate(-1);
+                        break;
+                    case 'ArrowRight':
+                        navigate(1);
+                        break;
+                    case ' ': // 空格键翻转卡片
+                        e.preventDefault();
+                        card.classList.toggle('flipped');
+                        break;
+                    case 'f': // F键收藏
+                    case 'F':
+                        e.preventDefault();
+                        toggleFavorite();
+                        break;
+                }
+            });
+
+            // 触摸滑动导航
+            let touchStartX = 0;
+            card.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+            });
+            card.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                if (touchEndX - touchStartX > 50) navigate(-1);
+                if (touchStartX - touchEndX > 50) navigate(1);
+                if (Math.abs(touchEndX - touchStartX) < 20) card.classList.toggle('flipped');
+            });
+        }
+
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
